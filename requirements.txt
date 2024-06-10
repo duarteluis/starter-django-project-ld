@@ -1,0 +1,7 @@
+django
+
+# Plugins
+django-extensions
+
+# Code quality
+black
