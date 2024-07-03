@@ -12,18 +12,27 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ji)%q@v2dcz_sw+_$go5h2-#*6$^d)7mq$flp8p%28vex(x9wa"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -37,6 +46,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Plugins
+    "django_extensions",
+    "debug_toolbar",
+    "allauth_ui",
+    "allauth",
+    "allauth.account",
+    "allauth.mfa",
+    "allauth.usersessions",
+    "widget_tweaks",
+    "django_bootstrap5",
+    #
+    "apps.pages",
 ]
 
 MIDDLEWARE = [
@@ -47,6 +68,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
+    # Optional -- needed when: USERSESSIONS_TRACK_ACTIVITY = True
+    "allauth.usersessions.middleware.UserSessionsMiddleware",
 ]
 
 ROOT_URLCONF = "server.urls"
@@ -54,7 +80,7 @@ ROOT_URLCONF = "server.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "server/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -99,13 +125,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by email
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fr"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Zurich"
 
 USE_I18N = True
 
@@ -116,8 +148,178 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "server/public/static"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "server/public/media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+DEBUG_TOOLBAR_PANELS = [
+    "debug_toolbar.panels.history.HistoryPanel",
+    "debug_toolbar.panels.versions.VersionsPanel",
+    "debug_toolbar.panels.timer.TimerPanel",
+    "debug_toolbar.panels.settings.SettingsPanel",
+    "debug_toolbar.panels.headers.HeadersPanel",
+    "debug_toolbar.panels.request.RequestPanel",
+    "debug_toolbar.panels.sql.SQLPanel",
+    "debug_toolbar.panels.staticfiles.StaticFilesPanel",
+    "debug_toolbar.panels.templates.TemplatesPanel",
+    "debug_toolbar.panels.cache.CachePanel",
+    "debug_toolbar.panels.signals.SignalsPanel",
+    "debug_toolbar.panels.redirects.RedirectsPanel",
+    "debug_toolbar.panels.profiling.ProfilingPanel",
+]
+
+# Default settings
+BOOTSTRAP5 = {
+    # The complete URL to the Bootstrap CSS file.
+    # Note that a URL can be either a string
+    # ("https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"),
+    # or a dict with keys `url`, `integrity` and `crossorigin` like the default value below.
+    "css_url": {
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css",
+        "integrity": "sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx",
+        "crossorigin": "anonymous",
+    },
+    # The complete URL to the Bootstrap bundle JavaScript file.
+    "javascript_url": {
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js",
+        "integrity": "sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa",
+        "crossorigin": "anonymous",
+    },
+    # The complete URL to the Bootstrap CSS theme file (None means no theme).
+    "theme_url": None,
+    # Color mode (None means do not set color mode).
+    "color_mode": None,
+    # Put JavaScript in the HEAD section of the HTML document (only relevant if you use bootstrap5.html).
+    "javascript_in_head": False,
+    # Wrapper class for non-inline fields.
+    # The default value "mb-3" is the spacing as used by Bootstrap 5 example code.
+    "wrapper_class": "mb-3",
+    # Wrapper class for inline fields.
+    # The default value is empty, as Bootstrap5 example code doesn't use a wrapper class.
+    "inline_wrapper_class": "",
+    # Label class to use in horizontal forms.
+    "horizontal_label_class": "col-sm-2",
+    # Field class to use in horizontal forms.
+    "horizontal_field_class": "col-sm-10",
+    # Field class used for horizontal fields withut a label.
+    "horizontal_field_offset_class": "offset-sm-2",
+    # Set placeholder attributes to label if no placeholder is provided.
+    "set_placeholder": True,
+    # Class to indicate required field (better to set this in your Django form).
+    "required_css_class": "",
+    # Class to indicate field has one or more errors (better to set this in your Django form).
+    "error_css_class": "",
+    # Class to indicate success, meaning the field has valid input (better to set this in your Django form).
+    "success_css_class": "",
+    # Enable or disable Bootstrap 5 server side validation classes (separate from the indicator classes above).
+    "server_side_validation": True,
+    # Renderers (only set these if you have studied the source and understand the inner workings).
+    "formset_renderers": {
+        "default": "django_bootstrap5.renderers.FormsetRenderer",
+    },
+    "form_renderers": {
+        "default": "django_bootstrap5.renderers.FormRenderer",
+    },
+    "field_renderers": {
+        "default": "django_bootstrap5.renderers.FieldRenderer",
+    },
+}
+
+# AUTH_USER_MODEL = "accounts.user"
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+
+# ALLAUTH parameters
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_CHANGE_EMAIL = False
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+ACCOUNT_EMAIL_NOTIFICATIONS = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+# ACCOUNT_EMAIL_SUBJECT_PREFIX =
+# ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS
+# ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+ACCOUNT_EMAIL_MAX_LENGTH = 254
+ACCOUNT_MAX_EMAIL_ADDRESSES = 3
+ACCOUNT_FORMS = {
+    "add_email": "allauth.account.forms.AddEmailForm",
+    "change_password": "allauth.account.forms.ChangePasswordForm",
+    "confirm_login_code": "allauth.account.forms.ConfirmLoginCodeForm",
+    "login": "allauth.account.forms.LoginForm",
+    "request_login_code": "allauth.account.forms.RequestLoginCodeForm",
+    "reset_password": "allauth.account.forms.ResetPasswordForm",
+    "reset_password_from_key": "allauth.account.forms.ResetPasswordKeyForm",
+    "set_password": "allauth.account.forms.SetPasswordForm",
+    # "signup": "allauth.account.forms.SignupForm",  # goal éliminer le signup
+    "user_token": "allauth.account.forms.UserTokenForm",
+}
+ACCOUNT_LOGIN_BY_CODE_ENABLED = False
+ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = 3
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 180
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+ACCOUNT_LOGOUT_ON_GET = False
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_PASSWORD_INPUT_RENDER_VALUE = False
+ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = (
+    "allauth.account.forms.EmailAwarePasswordResetTokenGenerator"
+)
+ACCOUNT_PRESERVE_USERNAME_CASING = True
+ACCOUNT_PREVENT_ENUMERATION = True
+# ACCOUNT_RATE_LIMITS (default: {...})
+ACCOUNT_REAUTHENTICATION_TIMEOUT = 300
+ACCOUNT_REAUTHENTICATION_REQUIRED = False
+ACCOUNT_SESSION_REMEMBER = False
+
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
+ACCOUNT_SIGNUP_FORM_CLASS = None
+ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = None
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_SIGNUP_REDIRECT_URL = LOGIN_REDIRECT_URL
+ACCOUNT_TEMPLATE_EXTENSION = "html"
+ACCOUNT_USERNAME_BLACKLIST = []
+ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_USER_DISPLAY (default: a callable returning user.username)
+ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_USERNAME_REQUIRED = True
+
+MFA_FORMS = {
+    "authenticate": "allauth.mfa.forms.AuthenticateForm",
+    "reauthenticate": "allauth.mfa.forms.AuthenticateForm",
+    "activate_totp": "allauth.mfa.forms.ActivateTOTPForm",
+    "deactivate_totp": "allauth.mfa.forms.DeactivateTOTPForm",
+}
+
+MFA_RECOVERY_CODE_COUNT = 10
+MFA_TOTP_PERIOD = 30
+MFA_TOTP_DIGITS = 6
+MFA_TOTP_ISSUER = "LD AUTH MFA"
+
+
+# USERSESSIONS_ADAPTER (default: "allauth.usersessions.adapter.DefaultUserSessionsAdapter")
+USERSESSIONS_TRACK_ACTIVITY = True
+
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+EMAIL_BACKEND = env("EMAIL_BACKEND")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = env("EMAIL_PORT")

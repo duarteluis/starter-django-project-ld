@@ -1,7 +1,15 @@
 django
 
 # Plugins
-django-extensions
+django-extensions  # https://github.com/django-extensions/django-extensions
+Werkzeug  # required by django-extensions
+django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
+django-bootstrap5  # https://github.com/zostera/django-bootstrap5
+django-allauth[mfa]  # django-allauth[mfa]
+django-allauth-ui  # https://github.com/danihodovic/django-allauth-ui
+django-widget-tweaks  # required by django-allauth-ui
+django-environ  #
 
 # Code quality
-black
+pre-commit
+ruff

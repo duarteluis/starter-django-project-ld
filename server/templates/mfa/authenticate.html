@@ -1,0 +1,35 @@
+{% extends "account/base.html" %}
+{% load i18n allauth account allauth_ui widget_tweaks %}
+
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block whitebox %}
+    <h1 class="mb-5 text-3xl text-center">{% trans "Two-Factor Authentication" %}</h1>
+    <p>{% blocktranslate %}Your account is protected by two-factor authentication. Please enter an authenticator code:{% endblocktranslate %}</p>
+    
+    <form method="POST"
+          action="{% url 'mfa_authenticate' %}"
+          class="flex flex-col items-center grow-0">
+        {% csrf_token %}
+        {% include "account/_non_field_errors.html" %}
+        {% for field in form.visible_fields %}
+            {% if field.name != "remember" %}
+                <div class="mb-4">
+                    {{ field|add_label_class:"font-semibold text-xs" }}
+                    {% if field.errors %}
+                        {% render_field field class="flex items-center w-64 h-12 px-4 pb-2 mt-2 border-red-500 rounded focus:outline-none focus:ring-2" %}
+                    {% else %}
+                        {% render_field field class="flex items-center w-64 h-12 px-4 pb-2 mt-2 rounded focus:outline-none focus:ring-2" %}
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span class="flex items-center max-w-xs mt-1 ml-1 text-xs font-medium tracking-wide text-red-500">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% translate "Sign In" as login_text %}
+        {% include "account/_button.html" with text=login_text %}
+    </form>
+{% endblock %}
