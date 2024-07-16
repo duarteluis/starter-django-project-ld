@@ -150,6 +150,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "server/public/static"
+STATICFILES_DIRS = [BASE_DIR / "server/static"]
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "server/public/media"
@@ -201,7 +202,7 @@ BOOTSTRAP5 = {
     # Color mode (None means do not set color mode).
     "color_mode": None,
     # Put JavaScript in the HEAD section of the HTML document (only relevant if you use bootstrap5.html).
-    "javascript_in_head": False,
+    "javascript_in_head": True,
     # Wrapper class for non-inline fields.
     # The default value "mb-3" is the spacing as used by Bootstrap 5 example code.
     "wrapper_class": "mb-3",
